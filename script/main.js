@@ -72,17 +72,18 @@ class square {
 }
 
 class triangle {
-    constructor(p1, p2, order, angle) {
+    constructor(p1, p2, angle) {
         this.p1 = { x: p1[0], y: p1[1] }
         this.p2 = { x: p2[0], y: p2[1] }
 
-        let z = Math.cos(degreeToRadian(angle)) * (this.p2.x - this.p1.x)
-        let x = Math.cos(degreeToRadian(angle)) * z
-        let y = Math.sin(degreeToRadian(angle)) * z
+        let i = radianToDegree(Math.atan((this.p2.y - this.p1.y) / (this.p2.x - this.p1.x)))
+        let v = angle
+        let w = v - i
+        let z = Math.sqrt((this.p2.x - this.p1.x) ** 2 + (this.p2.y - this.p1.y) ** 2)
+        let x = Math.cos(degreeToRadian(w)) * z
+        let y = Math.sin(degreeToRadian(w)) * z
 
-        this.p3 = {}
-        this.p3.x = this.p1.x + x
-        this.p3.y = this.p1.y - y
+        this.p3 = { x: this.p1.x + x, y: this.p1.y - y }
     }
 
     getP3 = () => {
@@ -122,13 +123,40 @@ class treeBuilder {
         this.children.push(new square(p1, p2, order))
     }
 
-    addTriangle = (p1, p2, order) => {
-        this.children.push(new triangle(p1, p2, order, this.angle))
+    addTriangle = (p1, p2) => {
+        this.children.push(new triangle(p1, p2, this.angle))
     }
 
     generate = () => {
-        this.addTriangle(this.root.getP4(), this.root.getP3(), 1)
-        this.addSquare()
+        let previusTriangle
+        let previusSquare
+        let order = this.order[0]
+        this.addTriangle(this.root.getP4(), this.root.getP3())
+
+        order = this.order[1]
+        previusTriangle = this.children[this.children.length - 1]
+        this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order)
+        this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order)
+
+        order = this.order[2]
+        previusSquare = this.children[this.children.length - 2]
+        this.addTriangle(previusSquare.getP4(), previusSquare.getP3())
+        previusSquare = this.children[this.children.length - 2]
+        this.addTriangle(previusSquare.getP4(), previusSquare.getP3())
+        
+        order = this.order[3]
+        previusTriangle = this.children[this.children.length - 2]
+        this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order)
+        this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order)
+        previusTriangle = this.children[this.children.length - 3]
+        this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order)
+        this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order)
+
+        // order = this.order[4]
+        // previusSquare = this.children[this.children.length - 2]
+        // this.addTriangle(previusSquare.getP4(), previusSquare.getP3())
+        // previusSquare = this.children[this.children.length - 2]
+        // this.addTriangle(previusSquare.getP4(), previusSquare.getP3())
     }
 
     draw = () => {
@@ -139,7 +167,7 @@ class treeBuilder {
 }
 
 const lowerBound = new ground()
-const tree = new treeBuilder([725, 800], [875, 800], 30, 3)
+const tree = new treeBuilder([725, 800], [875, 800], 80, 5)
 
 tree.generate()
 
