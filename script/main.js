@@ -51,8 +51,6 @@ class square {
         this.p4 = {}
         this.p4.x = this.p1.x + f
         this.p4.y = this.p1.y - g
-
-        this.children = []
     }
 
     getP3 = () => {
@@ -60,14 +58,6 @@ class square {
     }
     getP4 = () => {
         return [this.p4.x, this.p4.y]
-    }
-
-    branch = () => {
-        this.children.push(new triangle(this.getP4(), this.getP3(), 1, 30))
-
-        this.children.forEach(element => {
-            element.draw()
-        });
     }
 
     draw = () => {
@@ -115,26 +105,50 @@ class triangle {
     }
 }
 
-const angle = 30
+class treeBuilder {
+    constructor(p1, p2, angle, order) {
+        this.root = new square(p1, p2, 1)
+
+        this.angle = angle
+        this.order = []
+        for (let index = 1; index <= order; index++) {
+            this.order.push(index)
+        }
+
+        this.children = [this.root]
+    }
+
+    addSquare = (p1, p2, order) => {
+        this.children.push(new square(p1, p2, order))
+    }
+
+    addTriangle = (p1, p2, order) => {
+        this.children.push(new triangle(p1, p2, order, this.angle))
+    }
+
+    generate = () => {
+        this.addTriangle(this.root.getP4(), this.root.getP3(), 1)
+        this.addSquare()
+    }
+
+    draw = () => {
+        this.children.forEach(element => {
+            element.draw()
+        });
+    }
+}
+
 const lowerBound = new ground()
+const tree = new treeBuilder([725, 800], [875, 800], 30, 3)
 
-const order1Square1 = new square([700, 800], [900, 800], 1)
-// const order1Triangle1 = new triangle(order1Square1.getP4(), order1Square1.getP3(), 1, angle)
-
-// const order2Square1 = new square(order1Triangle1.getP1(), order1Triangle1.getP3(), 2)
-// const order2Square2 = new square(order1Triangle1.getP3(), order1Triangle1.getP2(), 2)
+tree.generate()
 
 const frame = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     lowerBound.draw()
-    
-    order1Square1.branch()
-    order1Square1.draw()
-    // order1Triangle1.draw()
 
-    // order2Square1.draw()
-    // order2Square2.draw()
+    tree.draw()
 
     window.requestAnimationFrame(frame)
 }
