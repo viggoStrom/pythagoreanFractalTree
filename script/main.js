@@ -35,6 +35,7 @@ class square {
         this.p1 = { x: p1[0], y: p1[1] }
         this.p2 = { x: p2[0], y: p2[1] }
 
+        // math works now idk dont touch
         let y = this.p2.y - this.p1.y
         let z = Math.sqrt((this.p2.x - this.p1.x) ** 2 + (y) ** 2)
         let v = radianToDegree(Math.asin(y / z))
@@ -51,14 +52,22 @@ class square {
         this.p4.x = this.p1.x + f
         this.p4.y = this.p1.y - g
 
+        this.children = []
     }
 
     getP3 = () => {
         return [this.p3.x, this.p3.y]
     }
-
     getP4 = () => {
         return [this.p4.x, this.p4.y]
+    }
+
+    branch = () => {
+        this.children.push(new triangle(this.getP4(), this.getP3(), 1, 30))
+
+        this.children.forEach(element => {
+            element.draw()
+        });
     }
 
     draw = () => {
@@ -86,6 +95,16 @@ class triangle {
         this.p3.y = this.p1.y - y
     }
 
+    getP3 = () => {
+        return [this.p3.x, this.p3.y]
+    }
+    getP2 = () => {
+        return [this.p2.x, this.p2.y]
+    }
+    getP1 = () => {
+        return [this.p1.x, this.p1.y]
+    }
+
     draw = () => {
         ctx.fillStyle = "lightGray"
         ctx.beginPath()
@@ -96,18 +115,26 @@ class triangle {
     }
 }
 
+const angle = 30
 const lowerBound = new ground()
+
 const order1Square1 = new square([700, 800], [900, 800], 1)
-const order1Triangle1 = new triangle(order1Square1.getP4(), order1Square1.getP3(),1,30)
-const order2Square1 = new square()
+// const order1Triangle1 = new triangle(order1Square1.getP4(), order1Square1.getP3(), 1, angle)
+
+// const order2Square1 = new square(order1Triangle1.getP1(), order1Triangle1.getP3(), 2)
+// const order2Square2 = new square(order1Triangle1.getP3(), order1Triangle1.getP2(), 2)
 
 const frame = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     lowerBound.draw()
-
+    
+    order1Square1.branch()
     order1Square1.draw()
-    order1Triangle1.draw()
+    // order1Triangle1.draw()
+
+    // order2Square1.draw()
+    // order2Square2.draw()
 
     window.requestAnimationFrame(frame)
 }
