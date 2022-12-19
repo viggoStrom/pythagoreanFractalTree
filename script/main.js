@@ -52,7 +52,7 @@ class ground {
 }
 
 class square {
-    constructor(p1, p2, order) {
+    constructor(p1, p2, order, angle) {
         this.order = order
         this.height = 100 * .9 ** this.order
 
@@ -60,21 +60,25 @@ class square {
         this.p2 = { x: p2[0], y: p2[1] }
 
         // math works now idk dont touch
-        let y = this.p2.y - this.p1.y
-        let z = Math.sqrt((this.p2.x - this.p1.x) ** 2 + (y) ** 2)
-        let v = Math.asinD(y / z)
-        let u = 90 - v
         let h = this.height
-        let g = h * Math.sinD(u)
-        let f = h * Math.cosD(u)
+        
+        let deltaX = this.p2.x - this.p1.x
+        let deltaY = this.p2.y - this.p1.y
+        let z = Math.sqrt(deltaX ** 2 + deltaY ** 2)
+        
+        let v = this.angle
 
+        let u = 90 - v
+        let x = h * Math.cosD(u)
+        let y = h * Math.sinD(u)
+        
         this.p3 = {}
-        this.p3.x = this.p2.x + f
-        this.p3.y = this.p2.y - g
+        this.p3.x = this.p2.x - x
+        this.p3.y = this.p2.y - y
 
         this.p4 = {}
-        this.p4.x = this.p1.x + f
-        this.p4.y = this.p1.y - g
+        this.p4.x = this.p1.x - x
+        this.p4.y = this.p1.y - y
     }
 
     getP3 = () => {
@@ -132,7 +136,7 @@ class triangle {
 
 class treeBuilder {
     constructor(p1, p2, angle, order) {
-        this.root = new square(p1, p2, 1)
+        this.root = new square(p1, p2, 1, angle)
 
         this.angle = angle
         this.order = []
@@ -146,7 +150,7 @@ class treeBuilder {
     }
 
     addSquare = (p1, p2, order) => {
-        this.children.push(new square(p1, p2, order))
+        this.children.push(new square(p1, p2, order, this.angle))
     }
 
     addTriangle = (p1, p2) => {
@@ -161,8 +165,8 @@ class treeBuilder {
 
         order = this.order[1]
         previusTriangle = this.children[this.children.length - 1]
-        this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order)
-        this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order)
+        this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order, this.angle)
+        this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order, this.angle)
 
         order = this.order[2]
         previusSquare = this.children[this.children.length - 2]
@@ -170,13 +174,13 @@ class treeBuilder {
         previusSquare = this.children[this.children.length - 2]
         this.addTriangle(previusSquare.getP4(), previusSquare.getP3())
 
-        order = this.order[3]
-        previusTriangle = this.children[this.children.length - 2]
-        this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order)
-        this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order)
-        previusTriangle = this.children[this.children.length - 3]
-        this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order)
-        this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order)
+        // order = this.order[3]
+        // previusTriangle = this.children[this.children.length - 2]
+        // this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order, this.angle)
+        // this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order, this.angle)
+        // previusTriangle = this.children[this.children.length - 3]
+        // this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order, this.angle)
+        // this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order, this.angle)
     }
 
     draw = () => {
