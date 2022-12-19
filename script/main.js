@@ -7,12 +7,36 @@ const ctx = canvas.getContext("2d")
 canvas.height = 1000
 canvas.width = canvas.height * 16 / 10
 
-const degreeToRadian = (angle) => {
+Math.degreeToRadian = (angle) => {
     return angle * Math.PI / 180
 }
 
-const radianToDegree = (angle) => {
+Math.radianToDegree = (angle) => {
     return angle / (Math.PI / 180)
+}
+
+Math.sinD = (angleInDegrees) => {
+    let radian = Math.degreeToRadian(angleInDegrees)
+    let value = Math.sin(radian)
+    return value
+}
+
+Math.asinD = (value) => {
+    let radian = Math.asin(value)
+    let degree = Math.radianToDegree(radian)
+    return degree
+}
+
+Math.cosD = (angleInDegrees) => {
+    let radian = Math.degreeToRadian(angleInDegrees)
+    let value = Math.cos(radian)
+    return value
+}
+
+Math.acosD = (value) => {
+    let radian = Math.acos(value)
+    let degree = Math.radianToDegree(radian)
+    return degree
 }
 
 class ground {
@@ -38,11 +62,11 @@ class square {
         // math works now idk dont touch
         let y = this.p2.y - this.p1.y
         let z = Math.sqrt((this.p2.x - this.p1.x) ** 2 + (y) ** 2)
-        let v = radianToDegree(Math.asin(y / z))
+        let v = Math.asinD(y / z)
         let u = 90 - v
         let h = this.height
-        let g = h * Math.sin(degreeToRadian(u))
-        let f = h * Math.cos(degreeToRadian(u))
+        let g = h * Math.sinD(u)
+        let f = h * Math.cosD(u)
 
         this.p3 = {}
         this.p3.x = this.p2.x + f
@@ -76,12 +100,12 @@ class triangle {
         this.p1 = { x: p1[0], y: p1[1] }
         this.p2 = { x: p2[0], y: p2[1] }
 
-        let i = radianToDegree(Math.atan((this.p2.y - this.p1.y) / (this.p2.x - this.p1.x)))
+        let i = Math.radianToDegree(Math.atan((this.p2.y - this.p1.y) / (this.p2.x - this.p1.x)))
         let v = angle
-        let w = v - i
+        var w = v - i
         let z = Math.sqrt((this.p2.x - this.p1.x) ** 2 + (this.p2.y - this.p1.y) ** 2)
-        let x = Math.cos(degreeToRadian(w)) * z
-        let y = Math.sin(degreeToRadian(w)) * z
+        let x = Math.cosD(w) * z
+        let y = Math.sinD(w) * z
 
         this.p3 = { x: this.p1.x + x, y: this.p1.y - y }
     }
@@ -117,6 +141,8 @@ class treeBuilder {
         }
 
         this.children = [this.root]
+        this.squares = [this.root]
+        this.triangles = []
     }
 
     addSquare = (p1, p2, order) => {
@@ -143,7 +169,7 @@ class treeBuilder {
         this.addTriangle(previusSquare.getP4(), previusSquare.getP3())
         previusSquare = this.children[this.children.length - 2]
         this.addTriangle(previusSquare.getP4(), previusSquare.getP3())
-        
+
         order = this.order[3]
         previusTriangle = this.children[this.children.length - 2]
         this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order)
@@ -151,12 +177,6 @@ class treeBuilder {
         previusTriangle = this.children[this.children.length - 3]
         this.addSquare(previusTriangle.getP1(), previusTriangle.getP3(), order)
         this.addSquare(previusTriangle.getP3(), previusTriangle.getP2(), order)
-
-        // order = this.order[4]
-        // previusSquare = this.children[this.children.length - 2]
-        // this.addTriangle(previusSquare.getP4(), previusSquare.getP3())
-        // previusSquare = this.children[this.children.length - 2]
-        // this.addTriangle(previusSquare.getP4(), previusSquare.getP3())
     }
 
     draw = () => {
@@ -167,7 +187,7 @@ class treeBuilder {
 }
 
 const lowerBound = new ground()
-const tree = new treeBuilder([725, 800], [875, 800], 80, 5)
+const tree = new treeBuilder([725, 800], [875, 800], 47, 5)
 
 tree.generate()
 
